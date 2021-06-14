@@ -1,0 +1,25 @@
+overwrite: true
+schema: "./graphql/schema.graphql"
+documents: src/graphqlClient/**/*.graphql
+generates:
+  src/types/generated/serverGraphql.d.ts:
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+    config:
+      useIndexSignature: true
+      enumsAsTypes: true
+      contextType: ../server/context#CustomContext
+      scalars:
+        DateTime: Date
+  src/types/generated/clientGraphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      enumsAsTypes: true
+      withHooks: true
+      withComponent: false
+      withHOC: false
+      maybeValue: T | undefined

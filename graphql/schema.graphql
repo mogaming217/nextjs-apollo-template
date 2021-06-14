@@ -1,0 +1,37 @@
+# Scalars
+
+scalar DateTime
+
+
+## directives
+
+
+directive @authorization(
+  requires: UserRole = member
+) on OBJECT | FIELD_DEFINITION | QUERY | MUTATION
+
+enum UserRole {
+  member # 例えば、ログインしているユーザー
+}
+
+
+type User {
+  id: ID!
+  name: String
+}
+
+
+## Queries
+
+
+type Query {
+  user(id: ID!): User
+}
+
+
+## mutations
+
+
+type Mutation {
+  saveUser(name: String): User! @authorization(requires: member)
+}

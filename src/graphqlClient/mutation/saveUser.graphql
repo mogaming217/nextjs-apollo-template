@@ -1,0 +1,6 @@
+mutation saveUser($name: String) {
+  saveUser(name: $name) {
+    id
+    name
+  }
+}
