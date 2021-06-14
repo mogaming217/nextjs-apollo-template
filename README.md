@@ -1,4 +1,4 @@
-# Next.js x Apollo Server x Apollo Client
+# Next.js x Apollo Server/Client x Chakra UI
 
 ## セットアップ
 ```
