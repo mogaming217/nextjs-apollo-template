@@ -5,9 +5,9 @@ import { ModalProviderContainer } from 'context/modal'
 import { apolloClient } from 'graphqlClient/apollo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 
-const Providers: FC = ({ children }) => {
+const Providers: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <ChakraProvider>
       <ApolloProvider client={apolloClient}>

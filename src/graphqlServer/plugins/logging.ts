@@ -6,7 +6,7 @@ import { v4 } from 'uuid'
 type Context = CustomContext
 
 export class LoggingPlugin implements ApolloServerPlugin<Context> {
-  requestDidStart(context: GraphQLRequestContext<Context>): GraphQLRequestListener<Context> {
+  async requestDidStart(context: GraphQLRequestContext<Context>): Promise<GraphQLRequestListener<Context>> {
     const requestID = v4()
 
     Logger.info({
@@ -17,8 +17,8 @@ export class LoggingPlugin implements ApolloServerPlugin<Context> {
     })
 
     return {
-      didEncounterErrors: ({ errors }) => {
-        // TODO: とりあえず全件出力
+      didEncounterErrors: async ({ errors }) => {
+        // FIXME: とりあえず全件出力しているので適宜修正
         errors.forEach(error => {
           Logger.error(
             {

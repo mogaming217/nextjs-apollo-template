@@ -18,6 +18,7 @@ enum UserRole {
 type User {
   id: ID!
   name: String
+  createdAt: DateTime!
 }
 
 

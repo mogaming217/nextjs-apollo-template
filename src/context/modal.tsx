@@ -25,7 +25,7 @@ type Dispatch = {
 const StateContext = createContext<State>({ ...initialState })
 const DispatchContext = createContext<Dispatch>({ ...initialState })
 
-export const ModalProviderContainer: FC = ({ children }) => {
+export const ModalProviderContainer: FC<{ children: ReactNode }> = ({ children }) => {
   const state = useCore()
   return (
     <StateContext.Provider value={state.state}>

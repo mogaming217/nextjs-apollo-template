@@ -1,10 +1,11 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | undefined;
+export type InputMaybe<T> = T | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -15,8 +16,6 @@ export type Scalars = {
   DateTime: any;
 };
 
-
-
 export type Mutation = {
   __typename?: 'Mutation';
   saveUser: User;
@@ -24,7 +23,7 @@ export type Mutation = {
 
 
 export type MutationSaveUserArgs = {
-  name?: Maybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
 };
 
 export type Query = {
@@ -39,6 +38,7 @@ export type QueryUserArgs = {
 
 export type User = {
   __typename?: 'User';
+  createdAt: Scalars['DateTime'];
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
 };
@@ -47,30 +47,18 @@ export type UserRole =
   | 'member';
 
 export type SaveUserMutationVariables = Exact<{
-  name?: Maybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type SaveUserMutation = (
-  { __typename?: 'Mutation' }
-  & { saveUser: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name'>
-  ) }
-);
+export type SaveUserMutation = { __typename?: 'Mutation', saveUser: { __typename?: 'User', id: string, name?: string | undefined } };
 
 export type UserQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type UserQuery = (
-  { __typename?: 'Query' }
-  & { user?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'name'>
-  )> }
-);
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, name?: string | undefined } | undefined };
 
 
 export const SaveUserDocument = gql`
