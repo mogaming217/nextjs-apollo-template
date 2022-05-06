@@ -1,10 +1,14 @@
 import { initializeApolloServer } from 'graphqlServer'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
+export const config = { api: { bodyParser: false } }
 
 const server = initializeApolloServer()
-export default server.createHandler({ path: '/api/graphql' })
+const startServer = server.start()
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  await startServer
+  await server.createHandler({
+    path: '/api/graphql',
+  })(req, res)
+}

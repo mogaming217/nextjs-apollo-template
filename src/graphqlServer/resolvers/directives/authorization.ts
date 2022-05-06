@@ -1,51 +1,46 @@
-import { AuthenticationError, SchemaDirectiveVisitor } from 'apollo-server-micro'
-import { defaultFieldResolver, GraphQLField, GraphQLInterfaceType, GraphQLObjectType } from 'graphql'
+import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils'
+import { AuthenticationError } from 'apollo-server-micro'
+import { defaultFieldResolver, GraphQLSchema } from 'graphql'
 import { UserRole } from 'types/generated/serverGraphql'
 import { PartialCustomContext } from 'types/server/context'
-import { ensureContext as _ensureContext, NextContext } from '../context'
 
-export class AuthorizationDirective extends SchemaDirectiveVisitor {
-  visitObject(objectType: GraphQLObjectType): GraphQLObjectType | void | null {
-    if ((objectType as any)._authorizationFieldsWrapped) return
-    ;(objectType as any)._authorizationFieldsWrapped = true
+const directiveName = 'authorization'
 
-    const fields = Object.values(objectType.getFields())
-    for (const field of fields) {
-      this.handleField(field)
-    }
-  }
+export const authorizationDirectiveTransformer = (schema: GraphQLSchema) => {
+  const typeDirectiveArgumentMaps: Record<string, any> = {}
 
-  visitFieldDefinition(
-    field: GraphQLField<any, any>,
-    _: {
-      objectType: GraphQLObjectType | GraphQLInterfaceType
-    }
-  ): GraphQLField<any, any> | void | null {
-    this.handleField(field)
-  }
+  return mapSchema(schema, {
+    [MapperKind.OBJECT_TYPE]: objectType => {
+      const authDirective = getDirective(schema, objectType, directiveName)?.[0]
+      if (authDirective) {
+        typeDirectiveArgumentMaps[objectType.name] = authDirective
+      }
+      return undefined
+    },
+    [MapperKind.OBJECT_FIELD]: (fieldConfig, _fieldName, typeName) => {
+      const authDirective = getDirective(schema, fieldConfig, directiveName)?.[0] ?? typeDirectiveArgumentMaps[typeName]
 
-  async ensureContext(args: NextContext): Promise<PartialCustomContext> {
-    return _ensureContext(args)
-  }
+      if (authDirective) {
+        const requiredRole: UserRole | undefined = authDirective.requires
 
-  private handleField(field: GraphQLField<any, any>) {
-    const { resolve = defaultFieldResolver } = field
-    field.resolve = async (...args) => {
-      const [, , ctx] = args
-      const context = await this.ensureContext(ctx)
+        if (requiredRole) {
+          const { resolve = defaultFieldResolver } = fieldConfig
 
-      const requiredRole: UserRole | undefined = this.args.requires
-      if (requiredRole) {
-        switch (requiredRole) {
-          case 'member':
-            if (!context.userID) {
-              throw new AuthenticationError('ログインが必要です。')
+          fieldConfig.resolve = async (source, args, context: PartialCustomContext, info) => {
+            switch (requiredRole) {
+              case 'member':
+                if (!context.userID) {
+                  throw new AuthenticationError('ログインが必要です。')
+                }
+                break
             }
-            break
+
+            return resolve(source, args, context, info)
+          }
+
+          return fieldConfig
         }
       }
-
-      return resolve.apply(this, args)
-    }
-  }
+    },
+  })
 }
