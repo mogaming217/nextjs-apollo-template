@@ -60,5 +60,8 @@
     "./**/*.{js,jsx,ts,tsx}": [
       "npm run lint:fix"
     ]
+  },
+  "volta": {
+    "node": "16.15.0"
   }
 }
